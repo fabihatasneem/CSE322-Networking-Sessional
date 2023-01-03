@@ -1,0 +1,10 @@
+HTTP Request : GET /dir1/dir2/send.txt HTTP/1.1
+---------------------------------------------------------------
+HTTP Response : 
+HTTP/1.1 200 OK;
+Server: Java HTTP Server: 1.0;
+Date: Sun Dec 25 01:56:59 BDT 2022;
+Content-Type: text/html;
+Content-Length: 924;
+
+

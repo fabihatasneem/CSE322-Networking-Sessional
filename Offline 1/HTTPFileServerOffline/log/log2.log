@@ -1,0 +1,10 @@
+HTTP Request : GET /uploaded/xyz.txt HTTP/1.1
+---------------------------------------------------------------
+HTTP Response : 
+HTTP/1.1 200 OK;
+Server: Java HTTP Server: 1.0;
+Date: Mon Dec 26 07:43:13 BDT 2022;
+Content-Type: text/html;
+Content-Length: 2815;
+
+
