@@ -5,7 +5,6 @@ import java.net.Socket;
 
 public class ClientThread implements Runnable {
     private Socket socket;
-    private Thread thread;
     private File file;
     public ClientThread(String input){
         this.file = new File(input);

@@ -24,27 +24,12 @@ public class ServerThread implements Runnable {
         thread.start();
     }
 
-    public static String readFileData(File file, int fileLength) throws IOException {
-        FileInputStream fileIn = null;
-        byte[] fileData = new byte[fileLength];
-
-        try {
-            fileIn = new FileInputStream(file);
-            fileIn.read(fileData);
-        } finally {
-            if (fileIn != null)
-                fileIn.close();
-        }
-
-        return String.valueOf(fileData);
-    }
-
     @Override
     public void run() {
-        String input = null;
-        BufferedReader br = null;
-        PrintWriter pr = null;
-        PrintWriter fw = null;
+        String input;
+        BufferedReader br;
+        PrintWriter pr;
+        PrintWriter fw;
 
         try {
             br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
@@ -54,6 +39,7 @@ public class ServerThread implements Runnable {
             numberOfRequests++;
         } catch (IOException e) {
             e.printStackTrace();
+            return;
         }
 
         if (input == null) {
@@ -96,9 +82,9 @@ public class ServerThread implements Runnable {
                     for (File entry : listOfFiles) {
                         String url = "http://localhost:" + port + "/" + path.toString().replace("\\", "/") + entry.getName();
                         if (entry.isDirectory()) {
-                            content.append("<b><i><a href=\"" + url + "\">" + entry.getName() + "</a></b></i><br>\n");
+                            content.append("<b><i><a href=\"").append(url).append("\">").append(entry.getName()).append("</a></b></i><br>\n");
                         } else if (entry.isFile()) {
-                            content.append("<a href=\"" + url + "\">" + entry.getName() + "</a><br>\n");
+                            content.append("<a href=\"").append(url).append("\">").append(entry.getName()).append("</a><br>\n");
                         }
                     }
                     content.append("</body>\n</html>");
@@ -143,18 +129,25 @@ public class ServerThread implements Runnable {
                         pr.flush();
 
                     } else if (extension.equals("jpg") || extension.equals("jpeg") || extension.equals("png")) {
-                        String imgUrl = root + "\\" + path;
-                        StringBuffer sb = new StringBuffer(imgUrl);
-                        sb.delete(imgUrl.length() - 1, imgUrl.length());
-                        content.append("<body><img src=\"" + sb + "\"></body></html>");
-
-                        response += "Content-Type: text/html;\r\n"+
-                                "Content-Length: " + content.length() + ";\r\n\r\n";
+                        byte[] data = new byte[(int) file.length()];
+                        response += "Content-Type: image/" + extension + ";\r\n"+
+                                "Content-Length: " + data.length + ";\r\n\r\n";
                         fw.println(response);
                         pr.write(response);
-                        pr.write(content.toString());
-                        pr.write("\r\n");
                         pr.flush();
+                        try {
+                            BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
+                            OutputStream os = socket.getOutputStream();
+                            int byteContent;
+                            while ((byteContent = is.read(data, 0, 1024)) != -1) {
+                                os.write(data, 0, byteContent);
+                                os.flush();
+                            }
+                            is.close();
+                            os.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     } else {
                         response += "Content-Type: application/force-download;\r\n"+
                                 "Content-Disposition: attachment;"+
