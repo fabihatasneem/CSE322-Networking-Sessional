@@ -88,6 +88,12 @@ for {set i 0} {$i < $val(nn) } {incr i} {
     $ns initial_node_pos $node($i) 20
 } 
 
+#give random uniform speed
+for {set i 0} {$i < $val(nn)} {incr i} {
+    $ns at [expr int(20 * rand()) + 10] "$node($i) setdest [expr int(10000 * rand()) % $val(as) + 0.5] [expr int(10000 * rand()) % $val(as) + 0.5] [expr int(100 * rand()) % 5 + 1]"
+}
+
+#create flows
 for {set i 0} {$i < $val(nf)} {incr i} {
     set src [expr { int(rand() * 10000) % $val(nn) }]
     set dest [expr { int(rand() * 10000) % $val(nn) }]
