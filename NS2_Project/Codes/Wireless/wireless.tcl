@@ -123,15 +123,17 @@ for {set i 0} {$i < $val(nf)} {incr i} {
 
     # Traffic config
     # create agent
-    set tcp [new Agent/TCP]
+    set tcp [new Agent/TCP/Reno]
     set tcp_sink [new Agent/TCPSink]
     # attach to nodes
     $ns attach-agent $node($src) $tcp
     $ns attach-agent $node($dest) $tcp_sink
-
     # connect the source with the sink
     $ns connect $tcp $tcp_sink
     $tcp set fid_ $i
+
+    $tcp set window_ 15
+    $tcp set packetRate_ $val(packet_rate)
 
 	# #Create an Exponential traffic agent and set its configuration parameters
 	# set traffic [new Application/Traffic/Exponential]
@@ -142,11 +144,16 @@ for {set i 0} {$i < $val(nf)} {incr i} {
 	# $traffic set idle_time_ $idle
 	# $traffic set rate_ $val(packet_rate)
 
-   # Create a CBR traffic source
-    set traffic [new Application/Traffic/CBR]
-    $traffic set packetSize_ $val(packet_size)
-    $traffic set interval_ 0.005
-    $traffic set rate_ $val(packet_rate)
+#    # Create a CBR traffic source
+#     set traffic [new Application/Traffic/CBR]
+#     $traffic set packetSize_ $val(packet_size)
+#     $traffic set interval_ 0.005
+#     $traffic set rate_ $val(packet_rate)
+
+    # Traffic generator
+    set traffic [new Application/FTP]
+    # attach to agent
+    $traffic attach-agent $tcp
 
     # Attach traffic source to the traffic generator
     $traffic attach-agent $tcp

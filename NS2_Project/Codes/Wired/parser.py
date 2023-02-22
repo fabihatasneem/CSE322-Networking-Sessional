@@ -24,11 +24,13 @@ for line in traceFile:
             sentPackets += 1
         elif splitList[0] == "r":
             receivedBytes += int(splitList[5])-headerBytes
-            receivedPackets += 1
+            
             delay = float(splitList[1]) - float(sentTime[splitList[11]])
             if delay < 0:
                 print("Error")
             totalDelay += delay
+
+            receivedPackets += 1
         elif splitList[0]=="d" or splitList[0]=="D":
             droppedPackets += 1
 
@@ -36,8 +38,10 @@ traceFile.close()
 
 networkThroughput = (receivedBytes*8)/((endTime-startTime)*1000)
 endToEndDelay = totalDelay/receivedPackets
-packetDeliveryRatio = (receivedPackets*1.0)/sentPackets*100
-packetDropRatio = (droppedPackets*1.0)/sentPackets*100
+packetDeliveryRatio = (receivedPackets*100)/sentPackets
+packetDropRatio = (droppedPackets*100)/sentPackets
+
+print("sentPackets ",sentPackets, " receivedPackets ", receivedPackets, " droppedPackets ", droppedPackets)
 
 # writing statistics to stat.txt
 statFile = open("stat.txt", "a")

@@ -71,7 +71,7 @@ struct edp {
 	/*
 	 * User supplied.
 	 */
-	int isHRED;		/* true if HRED, false if RED */
+	int isHRED;		/* 1 if HRED, 0 if RED */
 
 	int mean_pktsize;	/* avg pkt size, linked into Tcl */
 	int idle_pktsize;	/* avg pkt size used during idle times */

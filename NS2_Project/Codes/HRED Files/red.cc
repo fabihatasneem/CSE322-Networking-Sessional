@@ -262,6 +262,7 @@ void REDQueue::initParams()
 	edv_.v_prob1 = 0.0;
 	edv_.v_slope = 0.0;
 	edv_.v_prob = 0.0;
+	edv_.v_prob_b = 0.0;
 	edv_.v_a = 0.0;
 	edv_.v_b = 0.0;
 	edv_.v_c = 0.0;
@@ -516,7 +517,7 @@ double
 REDQueue::calculate_p_b(double v_ave, double th_max, double th_min, double max_p)
 {
 	double p;
-	p = max_p * (v_ave - th_min) / (th_max - th_min);
+	p = max_p * (v_ave - th_min) / (th_min - th_max);
 	return p;
 }
 
@@ -801,7 +802,7 @@ void REDQueue::enque(Packet *pkt)
 			//printf("pb = %f 	,	pa = %f\n", edv_.v_prob_b, edv_.v_prob);
 			if (drop_early(pkt)) // drop with probability pa		(step 6)
 			{
-				//printf("Drop : for qavg=%.6f < midpoint\n", qavg);
+				printf("Drop : for qavg=%.f < midpoint=%.f\n", qavg, midpoint);
 				droptype = DTYPE_UNFORCED;
 			}
 		}

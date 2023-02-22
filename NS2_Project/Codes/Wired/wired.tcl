@@ -4,16 +4,14 @@ set ns [new Simulator]
 # ======================================================================
 # Define options
 
-set val(ifq)          Queue/RED                ;# Interface queue type
-set val(ifqlen)       100                      ;# max packet in ifq
+set val(ifqlen)       90                       ;# max packet in ifq
 set val(packet_size)  500                      ;# size of packets
 set val(aqm)          [lindex $argv 0]         ;# 0 for RED, 1 for HRED
-set val(as)           [lindex $argv 1]         ;# area size
-set val(packet_rate)  [lindex $argv 2]         ;# rate of sending packets
-set val(nn)           [lindex $argv 3]         ;# number of nodes
-set val(nf)           [lindex $argv 4]         ;# number of flows
+set val(packet_rate)  [lindex $argv 1]         ;# rate of sending packets
+set val(nn)           [lindex $argv 2]         ;# number of nodes
+set val(nf)           [lindex $argv 3]         ;# number of flows
 set val(start_time)   0.5                      ;# start time
-set val(end_time)     50                       ;# end time
+set val(end_time)     100                      ;# end time
 # =======================================================================
 
 # setting queue size
@@ -25,7 +23,7 @@ Queue/RED set bytes_ false
 Queue/RED set queue_in_bytes_ false
 Queue/RED set gentle_ false
 Queue/RED set mean_pktsize_ 1000
-Queue/RED set cur_max_p_ 0.1
+Queue/RED set cur_max_p_ 1
 
 # trace file
 set trace_file [open trace.tr w]
@@ -33,40 +31,68 @@ $ns trace-all $trace_file
 
 # nam file
 set nam_file [open animation.nam w]
-$ns namtrace-all-wireless $nam_file $val(as) $val(as)
+$ns namtrace-all $nam_file
 
-# topology: to keep track of node movements
-set topo [new Topography]
-$topo load_flatgrid $val(as) $val(as) ;             
+#
+# Create a simple six node topology:
+#
+#        s1                 d1
+#         \                 /
+#          \               / 
+#     s2 _ _ r1 --------- r2 _ _ d2 
+#          /               \ 
+#         /                 \
+#        s3                 d3 
+#
 
-# general operation director for mobilenodes
-create-god $val(nn)
+# Create 2 routers
+set node_(r1) [$ns node]
+set node_(r2) [$ns node]
+
+# Update node numbers
+set val(nn) [expr {$val(nn) - 2}]
+
+puts "Number of nodes without routers $val(nn)"
+
+# Create links between the routers
+$ns duplex-link $node_(r1) $node_(r2) 1Mb 30ms RED 
+
+# Set queue limit for the routers
+$ns queue-limit $node_(r1) $node_(r2) $val(ifqlen)
+$ns queue-limit $node_(r2) $node_(r1) $val(ifqlen)
+$ns duplex-link-op $node_(r1) $node_(r2) orient right
+$ns duplex-link-op $node_(r1) $node_(r2) queuePos 0
+$ns duplex-link-op $node_(r2) $node_(r1) queuePos 0
 
 # create nodes
-for {set i 0} {$i < $val(nn)} {incr i} {
-    set node($i) [$ns node]
+for {set i 0} {$i < [expr {$val(nn) / 2}]} {incr i} {
+
+    # Source Nodes
+    set node_(s$i) [$ns node]
+    # Create link between the source nodes & r1
+    $ns duplex-link $node_(s$i) $node_(r1) 15Mb 10ms RED 
+
+    # Destination Nodes
+    set node_(d$i) [$ns node] 
+    # Create link between the dest nodes & r2
+    $ns duplex-link $node_(d$i) $node_(r2) 15Mb 10ms RED
 }
 
+set val(max) [expr {$val(nn) / 2}]
+set val(min) 0
+
 #Setup flows
+
 for {set i 0} {$i < $val(nf)} {incr i} {
 
-    set src [expr { int(rand() * 10000) % $val(nn) }]
-    set dest [expr { int(rand() * 10000) % $val(nn) }]
-    while {$src == $dest} {
-        set src [expr { int(rand() * 10000) % $val(nn) }]
-        set dest [expr { int(rand() * 10000) % $val(nn) }]
-    }
-
-    # Create link between the nodes
-    $ns duplex-link $node($src) $node($dest) 2Mb 10ms RED
-
-    # Set queue limit
-    $ns queue-limit $node($src) $node($dest) $val(ifqlen)
+    set src [expr int(rand() * ($val(max)-$val(min)))]
+    set dest [expr int(rand() * ($val(max)-$val(min)))]
+    
 
     set tcp [new Agent/TCP]
-    $ns attach-agent $node($src) $tcp
+    $ns attach-agent $node_(s$src) $tcp
     set sink [new Agent/TCPSink]
-    $ns attach-agent $node($dest) $sink
+    $ns attach-agent $node_(d$dest) $sink
     $ns connect $tcp $sink
     $tcp set fid_ $i
 
@@ -81,31 +107,24 @@ for {set i 0} {$i < $val(nf)} {incr i} {
 
     $ns at $val(start_time) "$traffic start"
     $ns at $val(end_time) "$traffic stop"
+    
 }
 
 # End Simulation
 
-# Stop nodes
-for {set i 0} {$i < $val(nn)} {incr i} {
-    $ns at 50.0 "$node($i) reset"
-}
-
 # call final function
 proc finish {} {
-    global ns trace_file nam_file
-    $ns flush-trace
-    close $trace_file
+    global ns nam_file trace_file
+    $ns flush-trace 
+    #Close the NAM trace file
     close $nam_file
+    close $trace_file
+    #Execute NAM on the trace file
+    # exec nam out.nam &
+    exit 0
 }
 
-proc halt_simulation {} {
-    global ns
-    puts "Simulation ending"
-    $ns halt
-}
-
-$ns at 50.0001 "finish"
-$ns at 50.0002 "halt_simulation"
+$ns at $val(end_time) "finish"
 
 # Run simulation
 puts "Simulation starting"

@@ -28,18 +28,23 @@ for line in traceFile:
         if splitList[6]=="tcp" and splitList[3]=="AGT":
             if splitList[0] == "s":
                 sentTime[splitList[5]] = splitList[1]
+
                 sentPackets += 1
             elif splitList[0] == "r":
                 receivedBytes += int(splitList[7])-headerBytes
-                receivedPackets += 1
+                
                 delay = float(splitList[1]) - float(sentTime[splitList[5]])
                 if delay < 0:
                     print("Error")
                 totalDelay += delay
-        if splitList[6]=="exp" and splitList[0]=="D":
+
+                receivedPackets += 1
+        if (splitList[6]=="exp" or splitList[6]=="tcp") and splitList[0]=="D":
             droppedPackets += 1
 
 traceFile.close()
+
+print("sentPackets ",sentPackets, " receivedPackets ", receivedPackets, " droppedPackets ", droppedPackets)
 
 networkThroughput = (receivedBytes*8)/((endTime-startTime)*1000)
 endToEndDelay = totalDelay/receivedPackets
