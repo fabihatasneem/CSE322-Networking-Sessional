@@ -5,7 +5,7 @@ touch stat.txt
 
 # defining baseline parameters
 baselineArea=500
-baselinePacketRate=200
+baselinePacketRate=300
 baselineNode=40
 baselineFlow=20
 baselineSpeed=10
@@ -129,77 +129,77 @@ baselineSpeed=10
 #===========================================================================================================
 
 # plotting graphs varying number of flows
-# aqm=0
-# echo -e "Number-of-Flows\nNetwork-Throughtput-(kilobits/sec) End-to-End-Avg-Delay-(sec) Packet-Delivery-Ratio-(%) Packet-Drop-Ratio-(%) Energy-Consumption-(J)" >> stat.txt
-# echo -e "---------- run.sh: Varying Number of Flows ----------\n"
-
-# flow=0
-# for((i=0; i<5; i++));
-# do
-#     flow=`expr 10 + $flow`
-#     echo -e "$flow" >> stat.txt
-
-#     echo -e "wireless.tcl: running with Area: $baselineArea PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $flow Speed: $baselineSpeed\n"
-#     ns wireless.tcl $aqm $baselineArea $baselinePacketRate $baselineNode $flow $baselineSpeed
-#     echo -e "\nparser.py: running\n"
-#     python3 parser.py
-# done
-
-# aqm=1
-
-# flow=0
-# for((i=0; i<5; i++));
-# do
-#     flow=`expr 10 + $flow`
-#     echo -e "$flow" >> stat.txt
-
-#     echo -e "wireless.tcl: running with Area: $baselineArea PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $flow Speed: $baselineSpeed\n"
-#     ns wireless.tcl $aqm $baselineArea $baselinePacketRate $baselineNode $flow $baselineSpeed
-#     echo -e "\nparser.py: running\n"
-#     python3 parser.py
-# done
-
-# echo -e "plotter.py: running\n"
-# python3 plotter.py
-
-# rm stat.txt
-# touch stat.txt
-
-# #===========================================================================================================
-
-# # plotting graphs varying speed
 aqm=0
-echo -e "Speed\nNetwork-Throughtput-(kilobits/sec) End-to-End-Avg-Delay-(sec) Packet-Delivery-Ratio-(%) Packet-Drop-Ratio-(%) Energy-Consumption-(J)" >> stat.txt
-echo -e "---------- run.sh: Varying Speed ----------\n"
+echo -e "Number-of-Flows\nNetwork-Throughtput-(kilobits/sec) End-to-End-Avg-Delay-(sec) Packet-Delivery-Ratio-(%) Packet-Drop-Ratio-(%) Energy-Consumption-(J)" >> stat.txt
+echo -e "---------- run.sh: Varying Number of Flows ----------\n"
 
-speed=0
+flow=0
 for((i=0; i<5; i++));
 do
-    speed=`expr 5 + $speed`
-    echo -e "$speed" >> stat.txt
+    flow=`expr 10 + $flow`
+    echo -e "$flow" >> stat.txt
 
-    echo -e "wireless.tcl: running with Area: $baselineArea PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $baselineFlow Speed: $speed\n"
-    ns wireless.tcl $aqm $baselineArea $baselinePacketRate $baselineNode $baselineFlow $speed
+    echo -e "wireless.tcl: running with Area: $baselineArea PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $flow Speed: $baselineSpeed\n"
+    ns wireless.tcl $aqm $baselineArea $baselinePacketRate $baselineNode $flow $baselineSpeed
     echo -e "\nparser.py: running\n"
     python3 parser.py
 done
 
 aqm=1
 
-speed=0
+flow=0
 for((i=0; i<5; i++));
 do
-    speed=`expr 5 + $speed`
-    echo -e "$speed" >> stat.txt
+    flow=`expr 10 + $flow`
+    echo -e "$flow" >> stat.txt
 
-    echo -e "wireless.tcl: running with Area: $baselineArea PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $baselineFlow Speed: $speed\n"
-    ns wireless.tcl $aqm $baselineArea $baselinePacketRate $baselineNode $baselineFlow $speed
+    echo -e "wireless.tcl: running with Area: $baselineArea PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $flow Speed: $baselineSpeed\n"
+    ns wireless.tcl $aqm $baselineArea $baselinePacketRate $baselineNode $flow $baselineSpeed
     echo -e "\nparser.py: running\n"
     python3 parser.py
 done
 
 echo -e "plotter.py: running\n"
 python3 plotter.py
+
+rm stat.txt
+touch stat.txt
+
+# #===========================================================================================================
+
+# # plotting graphs varying speed
+# aqm=0
+# echo -e "Speed\nNetwork-Throughtput-(kilobits/sec) End-to-End-Avg-Delay-(sec) Packet-Delivery-Ratio-(%) Packet-Drop-Ratio-(%) Energy-Consumption-(J)" >> stat.txt
+# echo -e "---------- run.sh: Varying Speed ----------\n"
+
+# speed=0
+# for((i=0; i<5; i++));
+# do
+#     speed=`expr 5 + $speed`
+#     echo -e "$speed" >> stat.txt
+
+#     echo -e "wireless.tcl: running with Area: $baselineArea PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $baselineFlow Speed: $speed\n"
+#     ns wireless.tcl $aqm $baselineArea $baselinePacketRate $baselineNode $baselineFlow $speed
+#     echo -e "\nparser.py: running\n"
+#     python3 parser.py
+# done
+
+# aqm=1
+
+# speed=0
+# for((i=0; i<5; i++));
+# do
+#     speed=`expr 5 + $speed`
+#     echo -e "$speed" >> stat.txt
+
+#     echo -e "wireless.tcl: running with Area: $baselineArea PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $baselineFlow Speed: $speed\n"
+#     ns wireless.tcl $aqm $baselineArea $baselinePacketRate $baselineNode $baselineFlow $speed
+#     echo -e "\nparser.py: running\n"
+#     python3 parser.py
+# done
+
+# echo -e "plotter.py: running\n"
+# python3 plotter.py
 
 #===========================================================================================================
 
