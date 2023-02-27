@@ -111,7 +111,7 @@ REDQueue::REDQueue(const char *trace) : link_(NULL), de_drop_(NULL), EDTrace(NUL
 	//	_RENAMED("queue-in-bytes_", "queue_in_bytes_");
 
 	bind("isHRED_", &edp_.isHRED); 				// 1 for HRED
-
+	//printf("isHRED_ set to %d\n", edp_.isHRED);
 	bind("thresh_", &edp_.th_min_pkts); // minthresh
 	bind("thresh_queue_", &edp_.th_min);
 	bind("maxthresh_", &edp_.th_max_pkts); // maxthresh
@@ -262,7 +262,6 @@ void REDQueue::initParams()
 	edv_.v_prob1 = 0.0;
 	edv_.v_slope = 0.0;
 	edv_.v_prob = 0.0;
-	edv_.v_prob_b = 0.0;
 	edv_.v_a = 0.0;
 	edv_.v_b = 0.0;
 	edv_.v_c = 0.0;
@@ -526,7 +525,10 @@ double
 REDQueue::calculate_p_a(double p_b)
 {
 	double p;
-	p = p_b * (1 / (1 - (edv_.count * p_b)));
+	p = p_b / (1 - (edv_.count * p_b));
+	if(p < 0)
+		p = p * -1;
+	printf("pb : %f,	pa : %f\n", p_b, p);
 	return p;
 }
 
@@ -586,8 +588,9 @@ int REDQueue::drop_early(Packet *pkt)
 	}
 	else
 	{
-		// do nothing for HRED.
-		// edv_.v_prob should already be calculated for when minTh < avg < maxTh
+		//HRED
+		edv_.v_prob1 = calculate_p_b(edv_.v_ave, edp_.th_max, edp_.th_min, edv_.cur_max_p);//(step 4)
+		edv_.v_prob = calculate_p_a(edv_.v_prob1);		//(step 5)
 	}
 
 	// drop probability is computed, pick random number and act
@@ -797,9 +800,6 @@ void REDQueue::enque(Packet *pkt)
 		// edp_.th_min <= qavg <= midpoint
 		else if (edp_.isHRED == 1 && edp_.th_min <= qavg && qavg < midpoint) // added for HRED (step 3)
 		{
-			edv_.v_prob_b = calculate_p_b(edv_.v_ave, edp_.th_max, edp_.th_min, edv_.cur_max_p);//(step 4)
-			edv_.v_prob = calculate_p_a(edv_.v_prob_b);		//(step 5)
-			//printf("pb = %f 	,	pa = %f\n", edv_.v_prob_b, edv_.v_prob);
 			if (drop_early(pkt)) // drop with probability pa		(step 6)
 			{
 				printf("Drop : for qavg=%.f < midpoint=%.f\n", qavg, midpoint);
@@ -814,7 +814,7 @@ void REDQueue::enque(Packet *pkt)
 		else if (edp_.isHRED == 1 && qavg >= midpoint && qavg <= edp_.th_max) // added for HRED
 		{
 			//printf("midpoint <= qavg=%.6f <= edp_.th_max\n", qavg);
-			edv_.v_prob = calculate_p_a(edv_.v_prob_b);			//(step 8)
+			edv_.v_prob = calculate_p_a(edv_.v_prob1);			//(step 8)
 		}
 		else if (edp_.isHRED == 1 && qavg >= edp_.th_max) // added for HRED
 		{

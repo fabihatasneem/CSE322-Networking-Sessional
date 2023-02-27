@@ -32,7 +32,7 @@ Queue/RED set bytes_ false
 Queue/RED set queue_in_bytes_ false
 Queue/RED set gentle_ false
 Queue/RED set mean_pktsize_ 1000
-Queue/RED set cur_max_p_ 0.1
+Queue/RED set cur_max_p_ 0.02
 
 # trace file
 set trace_file [open trace.tr w]

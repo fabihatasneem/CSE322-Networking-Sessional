@@ -4,9 +4,9 @@ echo -e "\n------------------ run.sh: starting -----------------\n"
 touch stat.txt
 
 # defining baseline parameters
-baselinePacketRate=200000
-baselineNode=10
-baselineFlow=10
+baselinePacketRate=300000
+baselineNode=100
+baselineFlow=99
 
 #===========================================================================================================
 
@@ -60,10 +60,11 @@ node=0
 for((i=0; i<5; i++));
 do
     node=`expr 20 + $node`
+    flow=`expr $node - 1`
     echo -e "$node" >> stat.txt
 
-    echo -e "wired.tcl: running with PacketRate: $baselinePacketRate Nodes: $node Flows: $baselineFlow\n"
-    ns wired.tcl $aqm $baselinePacketRate $node $baselineFlow
+    echo -e "wired.tcl: running with PacketRate: $baselinePacketRate Nodes: $node Flows: $flow\n"
+    ns wired.tcl $aqm $baselinePacketRate $node $flow
     echo -e "\nparser.py: running\n"
     python3 parser.py
 done
@@ -74,10 +75,11 @@ node=0
 for((i=0; i<5; i++));
 do
     node=`expr 20 + $node`
+    flow=`expr $node - 1`
     echo -e "$node" >> stat.txt
 
-    echo -e "wired.tcl: running with PacketRate: $baselinePacketRate Nodes: $node Flows: $baselineFlow\n"
-    ns wired.tcl $aqm $baselinePacketRate $node $baselineFlow
+    echo -e "wired.tcl: running with PacketRate: $baselinePacketRate Nodes: $node Flows: $flow\n"
+    ns wired.tcl $aqm $baselinePacketRate $node $flow
     echo -e "\nparser.py: running\n"
     python3 parser.py
 done
@@ -100,10 +102,11 @@ flow=0
 for((i=0; i<5; i++));
 do
     flow=`expr 10 + $flow`
+    node=`expr $flow - 1`
     echo -e "$flow" >> stat.txt
 
-    echo -e "wired.tcl: running with PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $flow\n"
-    ns wired.tcl $aqm $baselinePacketRate $baselineNode $flow
+    echo -e "wired.tcl: running with PacketRate: $baselinePacketRate Nodes: $node Flows: $flow\n"
+    ns wired.tcl $aqm $baselinePacketRate $node $flow
     echo -e "\nparser.py: running\n"
     python3 parser.py
 done
@@ -114,10 +117,11 @@ flow=0
 for((i=0; i<5; i++));
 do
     flow=`expr 10 + $flow`
+    node=`expr $flow - 1`
     echo -e "$flow" >> stat.txt
 
-    echo -e "wired.tcl: running with PacketRate: $baselinePacketRate Nodes: $baselineNode Flows: $flow\n"
-    ns wired.tcl $aqm $baselinePacketRate $baselineNode $flow
+    echo -e "wired.tcl: running with PacketRate: $baselinePacketRate Nodes: $baselnodeineNode Flows: $flow\n"
+    ns wired.tcl $aqm $baselinePacketRate $node $flow
     echo -e "\nparser.py: running\n"
     python3 parser.py
 done

@@ -125,7 +125,6 @@ struct edv {
 	double v_slope;		/* used in computing average queue size */
 				/* obsolete */
 	double v_prob;		/* prob. of packet drop */				//This is my pa for HRED
-	double v_prob_b;												//This is my pb for HRED
 	double v_a;		/* v_prob = v_a * v_ave + v_b */
 	double v_b;
 	double v_c;		/* used for "gentle" mode */
