@@ -516,7 +516,7 @@ double
 REDQueue::calculate_p_b(double v_ave, double th_max, double th_min, double max_p)
 {
 	double p;
-	p = max_p * (v_ave - th_min) / (th_min - th_max);
+	p = max_p * (v_ave - th_min) / (th_max - th_min);
 	return p;
 }
 
